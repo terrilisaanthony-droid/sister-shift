@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Sister Shift</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#fff;font-family:Georgia,'Times New Roman',serif;max-width:430px;margin:0 auto;min-height:100vh;}
+button{font-family:Georgia,'Times New Roman',serif;cursor:pointer;border:none;background:none;}
+input{font-family:sans-serif;color:#333;}
+::-webkit-scrollbar{display:none;}
+.screen{min-height:100vh;}
+.grad-header{background:linear-gradient(155deg,#0D3B4F 0%,#1A7A6E 100%);color:#fff;overflow:hidden;}
+.header-photo{width:100%;height:auto;display:block;}
+.badge{color:#C89B3C;font-size:11px;font-weight:700;letter-spacing:3px;font-family:sans-serif;margin-bottom:10px;}
+.sisters-row{display:flex;gap:10px;padding:20px 14px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sister-card{flex:0 0 92px;min-width:92px;border:2px solid;border-radius:16px;padding:14px 6px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
+.sister-initial{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;color:#fff;font-size:20px;font-weight:700;font-family:sans-serif;}
+.sister-name{font-size:12px;font-weight:700;font-family:sans-serif;text-align:center;}
+.mini-prog{width:100%;height:18px;border-radius:9px;background:#e0e0e0;overflow:hidden;
+  position:relative;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.mini-prog-fill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;}
+.mini-prog-label{position:relative;font-size:10px;font-weight:700;}
+.shift-card{margin:16px 14px 0;background:#f9f7f4;border-radius:14px;padding:16px 18px;border:1px solid #e8e3db;}
+.shift-card-label{font-size:10px;font-family:sans-serif;font-weight:700;letter-spacing:2px;color:#C89B3C;margin-bottom:4px;}
+.shift-card-dates{font-size:17px;color:#0D3B4F;}
+.shift-card-day{font-size:12px;color:#888;font-family:sans-serif;margin-top:2px;}
+.hint-box{margin:12px 14px 0;background:#f0faf9;border:1px solid #1A7A6E44;border-radius:12px;
+  padding:12px 16px;font-family:sans-serif;font-size:13px;color:#0D3B4F;line-height:1.5;}
+.past-section{margin:16px 14px 0;}
+.section-label{font-size:10px;font-family:sans-serif;font-weight:700;letter-spacing:2px;color:#aaa;margin-bottom:10px;}
+.past-shift-btn{width:100%;background:#fff;border:1px solid #eee;border-radius:14px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:10px;text-align:left;}
+.empty-state{text-align:center;padding:40px 20px;}
+.empty-text{color:#999;font-family:sans-serif;font-size:14px;line-height:1.7;margin-top:12px;}
+.refresh-btn{display:block;margin:16px auto 32px;color:#bbb;font-family:sans-serif;font-size:13px;padding:8px 16px;}
+.top-bar{padding:18px 20px 0;}
+.back-btn{color:rgba(255,255,255,0.85);font-size:15px;font-family:sans-serif;padding:0;display:block;margin-bottom:10px;}
+.back-btn-dark{color:#666;font-size:15px;font-family:sans-serif;padding:0;}
+.profile-head{display:flex;align-items:center;gap:14px;padding:18px 20px 0;}
+.big-initial{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;color:#fff;font-size:24px;font-weight:700;font-family:sans-serif;}
+.profile-name{font-size:26px;font-weight:400;font-style:italic;margin:0;}
+.menu-list{display:flex;flex-direction:column;gap:12px;padding:20px;}
+.menu-card{display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid;
+  border-radius:14px;padding:16px 14px;cursor:pointer;width:100%;text-align:left;}
+.menu-icon{font-size:22px;flex-shrink:0;}
+.menu-title{font-size:15px;font-weight:700;font-family:sans-serif;margin-bottom:2px;}
+.menu-sub{font-size:12px;color:#999;font-family:sans-serif;}
+.setup-wrap{min-height:100vh;padding-bottom:60px;}
+.setup-inner{padding:0 20px 56px;}
+.setup-title{font-size:28px;font-weight:400;font-style:italic;margin-top:16px;margin-bottom:4px;}
+.setup-sub{color:#888;font-family:sans-serif;font-size:13px;margin-bottom:20px;}
+.date-section{background:#fff;border-radius:14px;padding:14px;border:1px solid #eee;margin-bottom:20px;}
+.date-section-title{font-size:10px;font-family:sans-serif;font-weight:700;letter-spacing:2px;color:#aaa;margin-bottom:10px;}
+.date-row{display:flex;gap:12px;align-items:flex-end;}
+.date-field{flex:1;}
+.date-label-txt{font-size:11px;font-family:sans-serif;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;}
+.date-input{width:100%;padding:9px 10px;border:1.5px solid #ccc;border-radius:9px;font-size:14px;
+  font-family:sans-serif;background:#fafafa;-webkit-appearance:none;appearance:none;}
+.date-arrow{color:#aaa;font-size:18px;padding-bottom:10px;flex-shrink:0;}
+.date-note{font-size:11px;color:#bbb;font-family:sans-serif;margin-top:10px;}
+.goal-block{background:#fff;border-radius:14px;padding:14px;border:1px solid #eee;margin-bottom:12px;}
+.goal-top{display:flex;gap:10px;align-items:center;margin-bottom:10px;}
+.emoji-btn{width:44px;height:44px;border-radius:10px;border:1.5px solid #ddd;background:#fafafa;
+  font-size:22px;cursor:pointer;flex-shrink:0;}
+.goal-input{flex:1;padding:11px 12px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;
+  font-family:sans-serif;background:#fafafa;outline:none;}
+.freq-row{display:flex;gap:6px;flex-wrap:wrap;}
+.freq-chip{padding:6px 11px;border-radius:20px;border:1.5px solid #ddd;font-size:12px;
+  font-family:sans-serif;font-weight:600;cursor:pointer;background:#fff;color:#666;transition:all .15s;}
+.emoji-grid{display:none;flex-wrap:wrap;gap:6px;margin-top:10px;background:#f9f9f9;
+  border-radius:10px;padding:10px;border:1px solid #eee;}
+.emoji-grid.open{display:flex;}
+.emoji-opt{width:36px;height:36px;font-size:20px;background:none;border:none;cursor:pointer;border-radius:7px;}
+.save-btn{width:100%;padding:16px;border-radius:13px;border:none;color:#fff;font-size:16px;
+  font-family:sans-serif;font-weight:700;cursor:pointer;margin-top:12px;letter-spacing:.5px;}
+.save-btn:disabled{opacity:.6;cursor:not-allowed;}
+.saving-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:9999;color:#fff;font-family:sans-serif;}
+.saving-box{background:#1a1a1a;border-radius:20px;padding:32px 40px;text-align:center;}
+.saving-spinner{font-size:32px;display:block;margin-bottom:12px;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.saving-text{font-size:16px;font-weight:600;}
+.saving-sub{font-size:13px;opacity:.7;margin-top:6px;}
+.track-header{padding:44px 20px 18px;color:#fff;}
+.track-name{font-size:24px;font-weight:400;font-style:italic;margin-bottom:2px;}
+.track-dates-line{font-size:12px;opacity:.75;font-family:sans-serif;}
+.track-meta{font-size:12px;font-family:sans-serif;font-weight:700;opacity:.85;margin-top:3px;}
+.track-bar-bg{background:rgba(255,255,255,0.25);border-radius:999px;height:5px;overflow:hidden;margin-top:10px;}
+.track-bar-fill{height:100%;background:#fff;border-radius:999px;}
+.track-body{padding:16px 14px 48px;display:flex;flex-direction:column;gap:12px;}
+.banner{border:1px solid;border-radius:12px;padding:12px 14px;font-family:sans-serif;font-size:13px;text-align:center;}
+.day-card{border:1.5px solid #eee;border-radius:16px;padding:14px;background:#fff;margin-bottom:2px;}
+.day-label{font-size:11px;font-family:sans-serif;font-weight:500;letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase;color:#aaa;}
+.goals-col{display:flex;flex-direction:column;gap:8px;}
+.goal-chip{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;
+  border:1.5px solid #e0e0e0;text-align:left;font-family:sans-serif;cursor:pointer;width:100%;
+  background:#f5f5f5;color:#333;transition:background .15s;}
+.goal-chip.done{color:#fff;border-color:transparent;}
+.goal-chip.capped{background:#f8f8f8;color:#bbb;border-color:#e8e8e8;opacity:.6;cursor:default;}
+.chip-body{flex:1;}
+.chip-text{font-size:14px;font-weight:500;display:block;}
+.chip-freq{font-size:11px;font-weight:600;letter-spacing:.3px;color:#aaa;display:block;margin-top:1px;}
+.goal-chip.done .chip-freq{color:rgba(255,255,255,0.7);}
+.outline-btn{display:block;width:100%;padding:13px;border-radius:12px;border:1.5px solid;
+  font-family:sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-align:center;background:transparent;margin-top:4px;}
+.results-title{font-size:28px;font-weight:400;font-style:italic;margin-top:16px;margin-bottom:2px;}
+.results-sub{font-family:sans-serif;font-size:12px;color:#999;margin-bottom:18px;}
+.score-card{border-radius:20px;padding:26px 20px;text-align:center;margin-bottom:18px;color:#fff;}
+.score-pct{font-size:54px;font-weight:300;font-style:italic;line-height:1;}
+.score-label{font-family:sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-top:4px;}
+.score-detail{font-family:sans-serif;font-size:12px;opacity:.7;margin-top:6px;}
+.goal-result{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #eee;}
+.goal-result-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-bg{background:#f0f0f0;border-radius:999px;overflow:hidden;}
+.bar-fill{border-radius:999px;}
+.stand-card{border:1.5px solid #eee;border-radius:16px;overflow:hidden;margin-bottom:14px;}
+.stand-card-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;color:#fff;}
+.stand-init{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;font-family:sans-serif;flex-shrink:0;}
+.stand-goals{padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:#fff;}
+.stand-goal-row{display:flex;align-items:center;gap:8px;}
+.toast{position:fixed;bottom:20px;left:12px;right:12px;background:#1a1a1a;
+  color:#fff;padding:14px 18px;border-radius:16px;font-size:13px;font-weight:600;
+  font-family:sans-serif;z-index:8000;white-space:normal;word-break:break-word;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);display:none;pointer-events:none;line-height:1.5;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = "https://ecishaultjdxzivhdgme.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjaXNoYXVsdGpkeHppdmhkZ21lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3OTUzMzQsImV4cCI6MjA5NjM3MTMzNH0.Nnxl0w_mPaFmEdIzFZ44usJLlXea1rAjitp9aD31IhI";
+const PHOTO    = "https://assets.cdn.filesafe.space/CZR86kHF9gMc1lRV7268/media/6a24fe11fc95b24549a5fb88.png";
+
+// ── DB ────────────────────────────────────────────────────────────────────────
+async function dbReq(table, method, body, params="") {
+  const r = await fetch(`${SUPA_URL}/rest/v1/${table}${params}`, {
+    method,
+    body: body ? JSON.stringify(body) : undefined,
+    headers: {
+      "apikey": SUPA_KEY,
+      "Authorization": "Bearer " + SUPA_KEY,
+      "Content-Type": "application/json",
+      "Prefer": "return=representation",
+    },
+  });
+  const t = await r.text();
+  if (!r.ok) throw new Error(t);
+  return t ? JSON.parse(t) : [];
+}
+const dbGet   = (t,p)   => dbReq(t,"GET",null,p||"");
+const dbPost  = (t,b)   => dbReq(t,"POST",b);
+const dbPatch = (t,b,p) => dbReq(t,"PATCH",b,p);
+async function dbUpsert(table, body) {
+  const r = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: {
+      "apikey": SUPA_KEY,
+      "Authorization": "Bearer " + SUPA_KEY,
+      "Content-Type": "application/json",
+      "Prefer": "resolution=merge-duplicates,return=representation",
+    },
+  });
+  return r.json();
+}
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const SISTERS = ["Terri-Lisa","Wendy","Donna-Marie","Melanie"];
+const COLORS  = {
+  "Terri-Lisa":  {p:"#1A7A6E", l:"#e8f5f3", t:"#0D3B4F"},
+  "Wendy":       {p:"#7B4E8E", l:"#f3edf7", t:"#3B1F50"},
+  "Donna-Marie": {p:"#C45C3A", l:"#fdf0ec", t:"#5C1F0A"},
+  "Melanie":     {p:"#1ABCD6", l:"#e6f9fc", t:"#07505C"},
+};
+const FREQS = [
+  {v:"daily",  lbl:"Every day",    n:14},
+  {v:"6x",     lbl:"6× / week",    n:12},
+  {v:"5x",     lbl:"5× / week",    n:10},
+  {v:"4x",     lbl:"4× / week",    n:8},
+  {v:"3x",     lbl:"3× / week",    n:6},
+  {v:"2x",     lbl:"2× / week",    n:4},
+  {v:"weekly", lbl:"Once / week",  n:2},
+  {v:"once",   lbl:"Once (total)", n:1},
+];
+const FREQ_N = {daily:14,"6x":12,"5x":10,"4x":8,"3x":6,"2x":4,weekly:2,once:1};
+const FREQ_L = {daily:"Daily","6x":"6×/wk","5x":"5×/wk","4x":"4×/wk","3x":"3×/wk","2x":"2×/wk",weekly:"Weekly",once:"Once"};
+const EMOJIS = ["💧","🏃‍♀️","🥗","😴","🧘‍♀️","🦷","💰","🧹","📚","🌿","🚫","✨","❤️","🎯","⛪","🏋️","🚶","🍎","🫧","💊"];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let APP = {
+  screen: "home",
+  sister: null,
+  viewShiftId: null,
+  shifts: [],
+  goals: [],
+  checkins: [],
+  _goalCount: 5, // starts at 5, can be expanded
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const today  = () => {
+  // Use Eastern time (ET) to avoid UTC rollover showing "tomorrow" late at night
+  return new Date().toLocaleDateString("en-CA", {timeZone: "America/New_York"});
+};
+const addDay = (d,n) => { const x=new Date(d+"T12:00:00"); x.setDate(x.getDate()+n); return x.toISOString().split("T")[0]; };
+const fmtSh  = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+const fmtFull= s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+const fmtYr  = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+
+function getDates(start) {
+  const out=[], d=new Date(start+"T12:00:00");
+  for(let i=0;i<14;i++){const x=new Date(d);x.setDate(d.getDate()+i);out.push(x.toISOString().split("T")[0]);}
+  return out;
+}
+function buildLog(sister, shiftId) {
+  const log={};
+  APP.checkins.filter(c=>c.sister_name===sister&&c.shift_id===shiftId&&c.checked)
+    .forEach(c=>{log[c.date+"-"+c.goal_index]=true;});
+  return log;
+}
+function sisterGoals(sister, shiftId) {
+  return APP.goals.filter(g=>g.sister_name===sister&&g.shift_id===shiftId&&g.goal_text)
+    .sort((a,b)=>a.goal_index-b.goal_index);
+}
+function scoreGoal(log, gi, freq, dates, upTo, goalType) {
+  const past      = dates.filter(d=>d<=upTo);
+  const target    = FREQ_N[freq]||14;
+  const rawChecks = past.filter(d=>log[d+"-"+gi]).length;
+
+  if(goalType === "limit") {
+    // Limit goals: at or under = 100%, going over scales down
+    const finalPct = rawChecks <= target
+      ? 100
+      : Math.max(0, Math.round(100 - ((rawChecks - target) / target) * 100));
+    return {checks: rawChecks, target, prorated: target, pct: finalPct, isLimit:true};
+  }
+
+  // Build goals: allow exceeding target — percentage can go above 100%
+  const pct = target > 0 ? Math.round((rawChecks / target) * 100) : 0;
+  return {checks: rawChecks, target, prorated: target, pct, isLimit:false};
+}
+function totalScore(goals, log, dates, upTo) {
+  if(!goals.length) return {pct:0,checks:0,prorated:0};
+  let totalChecks=0, totalTarget=0;
+  goals.forEach((g,gi)=>{
+    const s=scoreGoal(log,gi,g.freq,dates,upTo,g.goal_type);
+    totalChecks += s.checks;
+    totalTarget += s.target;
+  });
+  // No cap — percentage can exceed 100% if goals are surpassed
+  return {
+    checks:   totalChecks,
+    prorated: totalTarget,
+    pct: totalTarget > 0 ? Math.round((totalChecks / totalTarget) * 100) : 0
+  };
+}
+
+function bar(pct,color,h=6) {
+  return `<div class="bar-bg" style="height:${h}px"><div class="bar-fill" style="height:${h}px;width:${Math.min(pct,100)}%;background:${color}"></div></div>`;
+}
+function currentShift() {
+  const t=today();
+  // First: a shift that includes today
+  const active = APP.shifts.find(s=>t>=s.start_date&&t<=s.end_date);
+  if(active) return active;
+  // Second: an upcoming shift (starts in the future) - return the soonest one
+  const upcoming = APP.shifts
+    .filter(s=>s.start_date>t)
+    .sort((a,b)=>a.start_date.localeCompare(b.start_date))[0];
+  if(upcoming) return upcoming;
+  // Third: most recently ended shift
+  return APP.shifts
+    .filter(s=>s.end_date<t)
+    .sort((a,b)=>b.end_date.localeCompare(a.end_date))[0] || null;
+}
+
+function isShiftActive(shift) {
+  if(!shift) return false;
+  const t=today();
+  return t>=shift.start_date && t<=shift.end_date;
+}
+function isShiftUpcoming(shift) {
+  if(!shift) return false;
+  return shift.start_date > today();
+}
+
+let _toastTimer=null;
+function showToast(msg) {
+  const el=document.getElementById("toast");
+  if(!el) return;
+  el.textContent=msg; el.style.display="block";
+  if(_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>{el.style.display="none";},10000);
+}
+
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    // Test connection first with a simple single request
+    const sh = await dbGet("shifts","?order=created_at.desc&limit=50");
+    APP.shifts = sh;
+    // Then load the rest
+    const [gl,ck] = await Promise.all([
+      dbGet("sister_goals","?order=goal_index.asc"),
+      dbGet("checkins",""),
+    ]);
+    APP.goals=gl; APP.checkins=ck;
+    APP._connected = true;
+    render();
+  } catch(e) {
+    APP._connected = false;
+    APP._connError = e && e.message ? e.message : String(e);
+    render();
+  }
+}
+
+// ── RENDER ROUTER ─────────────────────────────────────────────────────────────
+function go(screen, patch) {
+  if(patch) Object.assign(APP, patch);
+  APP.screen = screen;
+  if(screen === "setup") { renderSetup(); return; }
+  render();
+  window.scrollTo(0,0);
+}
+
+function render() {
+  const app = document.getElementById("app");
+  if(!app) return;
+  const map = {home:renderHome, menu:renderMenu, track:renderTrack, results:renderResults, standings:renderStandings, history:renderHistory};
+  app.innerHTML = (map[APP.screen]||renderHome)();
+  wire();
+  window.scrollTo(0,0);
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome() {
+  const t = today();
+  const cur = currentShift();
+  const past = APP.shifts.filter(s=>t>s.end_date).sort((a,b)=>b.start_date.localeCompare(a.start_date));
+
+  let html = `<div class="screen">
+    <div class="grad-header"><img class="header-photo" src="${PHOTO}" alt="The Sister Shift"/></div>`;
+
+  // Connection status
+  if(APP._connected === false) {
+    html += `<div style="margin:14px 14px 0;background:#fff0f0;border:1px solid #ffaaaa;border-radius:12px;padding:14px 16px;font-family:sans-serif;font-size:13px;color:#cc0000;line-height:1.6">
+      ⚠️ <strong>Cannot connect to database.</strong><br/>
+      Error: ${APP._connError||"Unknown"}<br/>
+      <span style="font-size:12px;color:#888">Check that this page is allowed to make external requests.</span>
+    </div>`;
+  }
+  // Hint if there's an active shift
+  if(cur && APP._connected !== false) {
+    html += `<div class="hint-box">👇 Tap your name to track today\'s goals or see your progress.</div>`;
+  }
+
+  html += `<div class="sisters-row">`;
+  SISTERS.forEach(s => {
+    const c = COLORS[s];
+    const goals = cur ? sisterGoals(s,cur.id) : [];
+    const log   = cur ? buildLog(s,cur.id) : {};
+    const dates = cur ? getDates(cur.start_date) : [];
+    const prog  = goals.length ? totalScore(goals,log,dates,t) : null;
+    // Always go to menu - menu will show the right option (Track/Join/etc)
+    const dest  = "menu";
+    html += `<button class="sister-card" data-screen="${dest}" data-sister="${s}"
+      style="border-color:${c.p};background:${c.l}">
+      <div class="sister-initial" style="background:${c.p}">${s[0]}</div>
+      <div class="sister-name" style="color:${c.t}">${s.split("-")[0]}</div>
+      ${prog
+        ? `<div class="mini-prog">
+             <div class="mini-prog-fill" style="width:${Math.min(prog.pct,100)}%;background:${c.p}"></div>
+             <span class="mini-prog-label" style="color:${c.p}">${prog.pct}%</span>
+           </div>`
+        : `<div style="color:${c.p};font-size:11px;margin-top:4px;font-family:sans-serif">Tap to start</div>`}
+    </button>`;
+  });
+  html += `</div>`;
+
+  if(cur) {
+    const elapsed = getDates(cur.start_date).filter(d=>d<=t).length;
+    html += `<div class="shift-card">
+      <div class="shift-card-label">ACTIVE SHIFT</div>
+      <div class="shift-card-dates">${cur.name||"Sister Shift"}</div>
+      <div class="shift-card-day">${fmtSh(cur.start_date)} — ${fmtSh(cur.end_date)} · Day ${Math.min(elapsed,14)} of 14</div>
+    </div>`;
+  }
+
+  if(past.length) {
+    html += `<div class="past-section"><div class="section-label">PAST SHIFTS</div>`;
+    past.forEach(s=>{
+      html += `<button class="past-shift-btn" data-screen="history" data-shiftid="${s.id}">
+        <div style="flex:1">
+          <div style="font-size:15px;color:#0D3B4F">${s.name||"Sister Shift"}</div>
+          <div style="font-size:12px;font-family:sans-serif;color:#aaa;margin-top:2px">${fmtSh(s.start_date)} — ${fmtSh(s.end_date)}</div>
+
+        </div><span style="color:#ccc;font-size:18px">→</span>
+      </button>`;
+    });
+    html += `</div>`;
+  }
+
+  if(!cur && !past.length) {
+    html += `<div class="empty-state"><div style="font-size:40px">🌟</div>
+      <p class="empty-text">No shift active yet.<br/>Tap your name to begin!</p></div>`;
+  }
+
+  html += `<button class="refresh-btn" id="js-refresh">↻ Refresh</button></div>`;
+  return html;
+}
+
+// ── MENU ──────────────────────────────────────────────────────────────────────
+function renderMenu() {
+  const t = today();
+  const s = APP.sister, c = COLORS[s];
+  const cur      = currentShift();
+  const active   = isShiftActive(cur);
+  const upcoming = isShiftUpcoming(cur);
+  const hasGoals = cur && sisterGoals(s,cur.id).length>0;
+  const hasPast  = APP.shifts.filter(x=>t>x.end_date).length > 0;
+
+  const mc = (icon,title,sub,screen,extra) =>
+    `<button class="menu-card" style="border-color:${c.p}" data-screen="${screen}" ${extra||""}>
+       <span class="menu-icon">${icon}</span>
+       <div style="flex:1;text-align:left">
+         <div class="menu-title" style="color:${c.t}">${title}</div>
+         <div class="menu-sub">${sub}</div>
+       </div>
+       <span style="color:${c.p};font-size:18px">→</span>
+     </button>`;
+
+  let cards = "";
+
+  if(cur) {
+    // ── There is a shift (active, upcoming, or recent) ──────────────────────
+    const shiftLabel = cur.name || "Current Shift";
+    const dateRange  = fmtSh(cur.start_date) + " — " + fmtSh(cur.end_date);
+
+    if(active && hasGoals)
+      cards += mc("📋","Track Today","Check off today's goals","track");
+
+    if(!hasGoals)
+      // No goals yet — invite sister to join with the EXISTING shift dates
+      cards += mc("✨", `Join ${shiftLabel}`,
+        `Set your goals for ${dateRange}`,
+        "joinshift", `data-start="${cur.start_date}" data-end="${cur.end_date}" data-shiftid="${cur.id}"`);
+
+    if(upcoming && hasGoals)
+      cards += `<div class="menu-card" style="border-color:#ccc;opacity:0.8;cursor:default">
+        <span class="menu-icon">🗓</span>
+        <div style="flex:1;text-align:left">
+          <div class="menu-title" style="color:#555">Goals Set ✓</div>
+          <div class="menu-sub">Shift starts ${fmtSh(cur.start_date)} — tracking opens then</div>
+        </div>
+      </div>`;
+
+    if(hasGoals)
+      cards += mc("📊","My Progress","See how you're doing","results",`data-shiftid="${cur.id}"`);
+    if(hasGoals)
+      cards += mc("✏️","Edit My Goals","Fix a typo or tweak your goals","editgoals");
+
+    cards += mc("👯","All Sisters","See everyone's progress","standings",`data-shiftid="${cur.id}"`);
+    if(s === "Terri-Lisa")
+      cards += mc("⚙️","Manage Shift","Edit dates, name, or delete this shift","manageshift",`data-shiftid="${cur.id}"`);
+
+  } else {
+    // ── No shift at all yet ──────────────────────────────────────────────────
+    cards += mc("🚀","Start New Shift","Pick your dates & set your goals","setup",
+      `data-start="${today()}" data-end="${addDay(today(),13)}"`);
+  }
+
+  // Terri-Lisa can always start a new shift (she's the organizer)
+  if(s === "Terri-Lisa")
+    cards += mc("🚀","Start New Shift","Begin the next two-week shift","setup",
+      `data-start="${today()}" data-end="${addDay(today(),13)}"`);
+
+  if(hasPast)
+    cards += mc("📖","Shift History","Look back at completed shifts","home");
+
+  return `<div class="screen" style="background:${c.l}">
+    <div class="top-bar"><button class="back-btn-dark" data-screen="home">← Back</button></div>
+    <div class="profile-head">
+      <div class="big-initial" style="background:${c.p}">${s[0]}</div>
+      <h2 class="profile-name" style="color:${c.t}">${s}</h2>
+    </div>
+    <div class="menu-list">${cards}</div>
+  </div>`;
+}
+
+// ── SETUP — standalone, no re-render on interaction ───────────────────────────
+function renderSetup() {
+  const app = document.getElementById("app");
+  const s = APP.sister, c = COLORS[s];
+  const startVal = APP._setupStart || today();
+  const endVal   = APP._setupEnd   || addDay(today(),13);
+
+  // If editing, pre-fill from existing goals
+  const _cs = currentShift();
+  const existingGoals = (APP._editMode && _cs) ? sisterGoals(s, _cs.id) : [];
+  const goalByIndex = {};
+  existingGoals.forEach(g => { goalByIndex[g.goal_index] = g; });
+
+  // Set goal count to max of default (5) or how many existing goals there are
+  const maxExistingIdx = existingGoals.length ? Math.max(...existingGoals.map(g=>g.goal_index)) : 4;
+  APP._goalCount = Math.max(APP._goalCount, maxExistingIdx + 1, 5);
+
+  let goalBlocks = "";
+  for(let i=0;i<APP._goalCount;i++){
+    const existing  = goalByIndex[i];
+    const saved     = APP._savedGoals && APP._savedGoals[i];
+    // Priority: saved (from add-slot re-render) > existing (from DB) > defaults
+    const textVal  = saved ? saved.text  : (existing ? existing.goal_text : "");
+    const emojiVal = saved ? saved.emoji : (existing ? existing.emoji : "🎯");
+    const freqVal  = saved ? saved.freq  : (existing ? existing.freq : "daily");
+
+    goalBlocks += `
+      <div class="goal-block">
+        <div class="goal-top">
+          <button type="button" class="emoji-btn" id="eb${i}">${emojiVal}</button>
+          <input type="text" class="goal-input" id="gi${i}"
+            placeholder="Goal ${i+1}${i>=2?" (optional)":""}" maxlength="60"
+            value="${(textVal||"").replace(/"/g,"&quot;")}"
+            style="border-color:${c.p}55"/>
+        </div>
+        <div class="freq-row" id="fr${i}">
+          ${FREQS.map(f=>`
+            <button type="button" class="freq-chip" data-freq="${f.v}" data-gi="${i}"
+              data-selected="${f.v===freqVal?"true":"false"}"
+              style="${f.v===freqVal?`background:${c.p};color:#fff;border-color:${c.p}`:""}">
+              ${f.lbl}
+            </button>`).join("")}
+        </div>
+        <div class="emoji-grid" id="eg${i}">
+          ${EMOJIS.map(e=>`<button type="button" class="emoji-opt" data-e="${e}" data-gi="${i}">${e}</button>`).join("")}
+        </div>
+      </div>`;
+  }
+
+  app.innerHTML = `<div class="setup-wrap" style="background:${c.l}">
+    <div class="top-bar"><button type="button" class="back-btn-dark" id="setup-back">← Back</button></div>
+    <div class="setup-inner">
+      <div class="setup-title" style="color:${c.t}">${APP._editMode ? "Edit Your Goals" : APP._joinMode ? "Set Your Goals" : "Set Your Goals"}</div>
+      <p class="setup-sub">${APP._editMode ? "Fix typos, adjust wording, or change frequency." : APP._joinMode ? "Choose up to 5 personal goals for this shift." : "Up to 5 goals — name it, set the frequency, pick an emoji."}</p>
+      ${APP._joinMode ? `
+        <!-- Joining an existing shift — show shift info only, no editing -->
+        <div class="date-section" style="background:#f0faf9;border-color:#1A7A6E44">
+          <div class="date-section-title" style="color:#1A7A6E">JOINING</div>
+          <div style="font-size:17px;color:#0D3B4F;margin-bottom:4px">${_cs ? (_cs.name||"Sister Shift") : "Current Shift"}</div>
+          <div style="font-family:sans-serif;font-size:13px;color:#888">${_cs ? fmtSh(_cs.start_date)+" — "+fmtSh(_cs.end_date) : ""}</div>
+        </div>
+      ` : `
+        <div class="date-section">
+          <div class="date-section-title">SHIFT NAME</div>
+          <input type="text" id="setup-name" class="date-input"
+            placeholder="e.g. Shift 11" maxlength="40"
+            value="${(APP._editMode && _cs && _cs.name) ? _cs.name.replace(/"/g,"&quot;") : ""}"
+            style="border-color:${c.p};margin-bottom:14px"/>
+          <div class="date-section-title">SHIFT DATES</div>
+          <div class="date-row">
+            <div class="date-field">
+              <span class="date-label-txt">Start</span>
+              <input type="date" id="setup-start" class="date-input" value="${startVal}" style="border-color:${c.p}"/>
+            </div>
+            <div class="date-arrow">→</div>
+            <div class="date-field">
+              <span class="date-label-txt">End</span>
+              <input type="date" id="setup-end" class="date-input" value="${endVal}" style="border-color:${c.p}"/>
+            </div>
+          </div>
+          <div class="date-note">Default is 14 days. Adjust end date if your shift is different.</div>
+        </div>
+      `}
+      ${goalBlocks}
+      <button type="button" id="add-goal-btn"
+        style="width:100%;padding:12px;border-radius:12px;border:1.5px dashed ${c.p};
+        background:transparent;color:${c.p};font-family:sans-serif;font-size:14px;
+        font-weight:600;cursor:pointer;margin-bottom:10px;">
+        + Add another goal
+      </button>
+
+      <button type="button" class="save-btn" id="save-btn" style="background:${c.p}">
+        ${APP._editMode ? "Save Changes ✦" : APP._joinMode ? "Join This Shift ✦" : "Save My Goals ✦"}
+      </button>
+    </div>
+  </div>`;
+
+  // Wire setup events (no setState, pure DOM)
+  document.getElementById("setup-back").onclick = () => {
+    APP._savedGoals = null;
+    APP._goalCount  = 5;
+    go("menu");
+  };
+
+  // Only wire date inputs when not in join mode (they don't exist in DOM when joining)
+  if(!APP._joinMode) {
+    const startIn = document.getElementById("setup-start");
+    if(startIn) startIn.onchange = function(){
+      document.getElementById("setup-end").value = addDay(this.value,13);
+    };
+  }
+
+  // Emoji toggles
+  document.querySelectorAll(".emoji-btn").forEach((eb,i)=>{
+    eb.onclick = () => {
+      const eg = document.getElementById("eg"+i);
+      const isOpen = eg.classList.contains("open");
+      document.querySelectorAll(".emoji-grid").forEach(g=>g.classList.remove("open"));
+      if(!isOpen) eg.classList.add("open");
+    };
+  });
+  document.querySelectorAll(".emoji-opt").forEach(eo=>{
+    eo.onclick = function(){
+      const gi = this.dataset.gi;
+      document.getElementById("eb"+gi).textContent = this.dataset.e;
+      document.getElementById("eg"+gi).classList.remove("open");
+    };
+  });
+
+  // Freq chips
+  const primary = c.p;
+  document.querySelectorAll(".freq-chip").forEach(fc=>{
+    fc.onclick = function(){
+      const gi = this.dataset.gi;
+      document.querySelectorAll(`.freq-chip[data-gi="${gi}"]`).forEach(x=>{
+        x.style.background="#fff"; x.style.color="#666"; x.style.borderColor="#ddd";
+        x.dataset.selected="false";
+      });
+      this.style.background=primary; this.style.color="#fff"; this.style.borderColor=primary;
+      this.dataset.selected="true";
+    };
+  });
+
+  // Save
+  document.getElementById("save-btn").onclick = saveShift;
+
+  // Add another goal button — saves current input values first, then adds a slot
+  document.getElementById("add-goal-btn").onclick = function(){
+    // Preserve what's already typed before re-rendering
+    for(let i=0;i<APP._goalCount;i++){
+      const textEl  = document.getElementById("gi"+i);
+      const emojiEl = document.getElementById("eb"+i);
+      const chipEl  = document.querySelector(`.freq-chip[data-gi="${i}"][data-selected="true"]`)
+                   || document.querySelector(`.freq-chip[data-gi="${i}"]`);
+      if(textEl)  APP._savedGoals = APP._savedGoals || {};
+      if(textEl)  { APP._savedGoals = APP._savedGoals||{}; APP._savedGoals[i] = {
+        text:  textEl.value,
+        emoji: emojiEl ? emojiEl.textContent.trim() : "🎯",
+        freq:  chipEl  ? chipEl.dataset.freq : "daily"
+      };}
+    }
+    APP._goalCount = (APP._goalCount || 5) + 1;
+    renderSetup();
+  };
+}
+
+// ── SAVE SHIFT ────────────────────────────────────────────────────────────────
+async function saveShift() {
+  // In join mode, use the pre-set dates from the existing shift
+  let startVal, endVal, nameVal;
+  if(APP._joinMode) {
+    startVal = APP._setupStart;
+    endVal   = APP._setupEnd;
+    nameVal  = null; // don't change the shift name
+  } else {
+    startVal = document.getElementById("setup-start").value;
+    endVal   = document.getElementById("setup-end").value;
+    nameVal  = (document.getElementById("setup-name").value || "").trim();
+    if(!startVal || !endVal) { showToast("Please pick your shift dates"); return; }
+    if(endVal < startVal)    { showToast("End date must be after start date"); return; }
+  }
+
+  // Collect goals from DOM
+  const goalsToSave = [];
+  const totalSlots = APP._goalCount || 5;
+  for(let i=0;i<totalSlots;i++){
+    const text  = (document.getElementById("gi"+i).value||"").trim();
+    const emoji = document.getElementById("eb"+i).textContent.trim();
+    const chip  = document.querySelector(`.freq-chip[data-gi="${i}"][data-selected="true"]`) ||
+                  document.querySelector(`.freq-chip[data-gi="${i}"]`);
+    const freq  = chip ? chip.dataset.freq : "daily";
+    goalsToSave.push({index:i, text, emoji, freq});
+  }
+
+  const hasGoals = goalsToSave.some(g=>g.text);
+  if(!hasGoals) { showToast("Add at least one goal!"); return; }
+
+  // Check connection first
+  if(APP._connected === false) {
+    showToast("No database connection — cannot save. Check the error on the home screen.");
+    return;
+  }
+
+  // Show blocking overlay so back button can't interrupt
+  const overlay = document.createElement("div");
+  overlay.className = "saving-overlay";
+  overlay.innerHTML = `<div class="saving-box">
+    <span class="saving-spinner">✦</span>
+    <div class="saving-text">Saving your goals…</div>
+    <div class="saving-sub">Please wait, don't go back</div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  try {
+    // 1. Create or update the shift
+    let shiftId;
+    const existing = APP.shifts.find(s=>s.start_date===startVal);
+    const shiftName = nameVal || "Sister Shift";
+    if(existing) {
+      shiftId = existing.id;
+      // In join mode, don't overwrite the shift name or end date
+      if(!APP._joinMode) {
+        await dbPatch("shifts",{end_date:endVal, name:shiftName},`?id=eq.${shiftId}`);
+      }
+    } else {
+      shiftId = "shift-" + Date.now();
+      await dbPost("shifts",{id:shiftId, name:shiftName, start_date:startVal, end_date:endVal});
+    }
+
+    // 2. Save ALL 5 goal rows in ONE batch upsert (array = single request)
+    const batch = goalsToSave.map(g=>({
+      id:        `${shiftId}-${APP.sister}-${g.index}`,
+      shift_id:  shiftId,
+      sister_name: APP.sister,
+      goal_index:  g.index,
+      goal_text:   g.text || null,
+      emoji:       g.emoji,
+      freq:        g.freq,
+    }));
+    await dbUpsert("sister_goals", batch);  // single request for all 5
+
+    // 3. Reload data
+    const [sh,gl,ck] = await Promise.all([
+      dbGet("shifts","?order=created_at.desc"),
+      dbGet("sister_goals","?order=goal_index.asc"),
+      dbGet("checkins",""),
+    ]);
+    APP.shifts=sh; APP.goals=gl; APP.checkins=ck;
+
+    document.body.removeChild(overlay);
+    showToast(APP._editMode ? "Goals updated! ✨" : "Goals saved! Let\'s go 💪");
+    APP._editMode = false;
+    // Go to menu so sister can tap Track Today
+    go("menu");
+
+  } catch(e) {
+    document.body.removeChild(overlay);
+    console.error("Save error:", e);
+    const msg = e && e.message ? e.message : String(e);
+    const short = msg.length > 120 ? msg.substring(0,120)+"…" : msg;
+    showToast("Save failed: " + short);
+  }
+}
+
+// ── TRACK ─────────────────────────────────────────────────────────────────────
+function renderTrack() {
+  const t = today();
+  const s = APP.sister, c = COLORS[s];
+  const cur = currentShift();
+  if(!cur) { 
+    // No active shift found - go back to menu
+    APP.screen = "menu";
+    return renderMenu();
+  }
+
+  const myGoals = sisterGoals(s, cur.id);
+  const myLog   = buildLog(s, cur.id);
+  const dates   = getDates(cur.start_date);
+  const past    = dates.filter(d=>d<=t);
+  const overall = totalScore(myGoals, myLog, dates, t);
+  const display = dates.filter(d=>d<=t).reverse();
+
+  let html = `<div class="screen">
+    <div class="track-header" style="background:${c.p}">
+      <button class="back-btn" data-screen="menu">← Back</button>
+      <div class="track-name">${cur.name||"Sister Shift"}</div>
+      <div class="track-dates-line">${s.split("-")[0]}'s goals · ${fmtSh(cur.start_date)} — ${fmtSh(cur.end_date)}</div>
+      <div class="track-meta">Day ${Math.min(past.length,14)} of 14 · ${overall.pct}% on track</div>
+      <div class="track-bar-bg"><div class="track-bar-fill" style="width:${(past.length/dates.length)*100}%"></div></div>
+    </div>
+    <div class="track-body">`;
+
+  if(t > cur.end_date) {
+    html += `<div class="banner" style="border-color:${c.p};background:${c.p}22">
+      🎉 Shift complete! Check your progress below.</div>`;
+  }
+
+  display.forEach(date=>{
+    const isT = date===t;
+    html += `<div class="day-card" style="${isT?`border-color:${c.p};border-width:2px;box-shadow:0 0 0 1px ${c.p}`:""}">
+      <div class="day-label" style="color:${isT?c.p:"#aaa"};font-weight:${isT?700:500}">
+        ${isT?"🌟 Today — ":""}${fmtFull(date)}
+      </div>
+      <div class="goals-col">`;
+    myGoals.forEach((goal,gi)=>{
+      const done    = !!myLog[date+"-"+gi];
+      const isLimit = goal.goal_type === "limit";
+      const target  = FREQ_N[goal.freq]||14;
+      const total   = dates.filter(d=>d<=t&&myLog[d+"-"+gi]).length;
+      // Never cap — always allow tracking beyond target
+      // "exceeding" = total checks across whole shift already >= target
+      const exceeding = !isLimit && total >= target && target > 0;
+
+      let freqLabel;
+      if(isLimit) {
+        freqLabel = `${FREQ_L[goal.freq]} limit · used ${total}/${target}`;
+      } else {
+        freqLabel = `${FREQ_L[goal.freq]} · ${total}/${target}${exceeding?" 🌟":""}`;
+      }
+
+      // Chip styles — gold celebration when exceeding goal
+      let chipBg, chipBorder, chipColor, chipIcon;
+      if(done && exceeding) {
+        chipBg = "linear-gradient(135deg,#C89B3C,#F0C830)";
+        chipBorder = "#C89B3C"; chipColor = "#fff"; chipIcon = "⭐";
+      } else if(done && isLimit) {
+        chipBg = "#C45C3A"; chipBorder = "#C45C3A"; chipColor = "#fff"; chipIcon = "✓";
+      } else if(done) {
+        chipBg = c.p; chipBorder = c.p; chipColor = "#fff"; chipIcon = "✓";
+      } else {
+        chipBg = "#f5f5f5"; chipBorder = "#e0e0e0"; chipColor = "#333"; chipIcon = "";
+      }
+
+      html += `<button class="goal-chip"
+        style="background:${chipBg};border-color:${chipBorder};color:${chipColor};
+          ${done&&exceeding?"box-shadow:0 0 0 3px #F0C83066;":""}"
+        data-ci="${cur.id}|${s}|${goal.goal_index}|${date}">
+        <span style="font-size:18px">${goal.emoji}</span>
+        <div class="chip-body">
+          <span class="chip-text">${goal.goal_text}${isLimit?` <span style="font-size:10px;opacity:.7">(tap if used)</span>`:""}</span>
+          <span class="chip-freq" style="color:${done?"rgba(255,255,255,0.75)":"#aaa"}">${freqLabel}</span>
+        </div>
+        ${chipIcon?`<span style="font-weight:700;font-size:16px">${chipIcon}</span>`:""}
+      </button>`;
+    });
+    html += `</div></div>`;
+  });
+
+  html += `<button class="outline-btn" style="color:${c.p};border-color:${c.p}"
+    data-screen="results" data-shiftid="${cur.id}">View My Progress →</button>
+  </div></div>`;
+  return html;
+}
+
+// ── RESULTS ───────────────────────────────────────────────────────────────────
+function renderResults() {
+  const t = today(), s = APP.sister, c = COLORS[s];
+  const shift = APP.shifts.find(x=>x.id===APP.viewShiftId) || currentShift();
+  if(!shift) { go("home"); return ""; }
+  const goals = sisterGoals(s, shift.id);
+  const log   = buildLog(s, shift.id);
+  const dates = getDates(shift.start_date);
+  const upTo  = t < shift.end_date ? t : shift.end_date;
+  const ov    = totalScore(goals, log, dates, upTo);
+  const ovExceeded = ov.pct >= 100;
+
+  let html = `<div class="screen" style="background:${c.l}">
+    <div class="top-bar"><button class="back-btn-dark" data-screen="track">← Back</button></div>
+    <div style="padding:0 20px 56px">
+      <div class="results-title" style="color:${c.t}">${t>shift.end_date?"Shift Complete 🎉":"My Progress"}</div>
+      <div class="results-sub">${fmtSh(shift.start_date)} — ${fmtSh(shift.end_date)}</div>
+      <div class="score-card" style="background:${ovExceeded?"linear-gradient(135deg,#C89B3C,#F0C830)":c.p}">
+        <div class="score-pct">${ovExceeded?"⭐ ":""}${ov.pct}%</div>
+        <div class="score-label">${ovExceeded?"Goal Exceeded! 🎉":"On Track"}</div>
+        <div class="score-detail">${ov.checks} of ${ov.prorated} total check-ins</div>
+      </div>`;
+
+  goals.forEach((g,gi)=>{
+    const sc = scoreGoal(log,gi,g.freq,dates,upTo,g.goal_type);
+    const exceeded = sc.pct >= 100;
+    html += `<div class="goal-result" style="${exceeded?"border-color:#C89B3C44;background:linear-gradient(135deg,#fffdf0,#fff)":""}">
+      <div class="goal-result-top">
+        <span style="font-size:22px">${g.emoji}</span>
+        <div style="flex:1">
+          <div style="font-family:sans-serif;font-size:14px;font-weight:600;color:#333">${g.goal_text}</div>
+          <div style="font-family:sans-serif;font-size:11px;color:#aaa;margin-top:1px">${g.goal_type==="limit"?`${FREQ_L[g.freq]} limit · used ${sc.checks}/${sc.target}`:`${FREQ_L[g.freq]} · ${sc.checks}/${sc.target} total`}</div>
+        </div>
+        <div style="font-family:sans-serif;font-weight:800;font-size:15px;color:${exceeded?"#C89B3C":c.p}">
+          ${exceeded?"⭐ ":""}${sc.pct}%
+        </div>
+      </div>
+      ${bar(sc.pct, exceeded?"#C89B3C":c.p)}
+    </div>`;
+  });
+  html += `</div></div>`;
+  return html;
+}
+
+// ── STANDINGS ─────────────────────────────────────────────────────────────────
+function sisterCard(sister, shiftId, upTo) {
+  const sc    = COLORS[sister];
+  const shift = APP.shifts.find(s=>s.id===shiftId);
+  const goals = sisterGoals(sister, shiftId);
+  const log   = buildLog(sister, shiftId);
+  const dates = shift ? getDates(shift.start_date) : [];
+  const prog  = goals.length ? totalScore(goals,log,dates,upTo) : null;
+
+  let html = `<div class="stand-card" style="border-color:${sc.p}44">
+    <div class="stand-card-hdr" style="background:${sc.p}">
+      <div class="stand-init">${sister[0]}</div>
+      <div style="flex:1">
+        <div style="font-family:sans-serif;font-size:15px;font-weight:700">${sister}</div>
+        <div style="font-family:sans-serif;font-size:12px;opacity:.8;margin-top:1px">${prog?prog.pct+"% on track":"No goals set yet"}</div>
+      </div>
+      ${prog?`<div style="font-style:italic;font-size:28px;font-weight:300">${prog.pct}%</div>`:""}
+    </div>`;
+
+  if(goals.length) {
+    html += `<div class="stand-goals">`;
+    goals.forEach((g,gi)=>{
+      const sc2 = scoreGoal(log,gi,g.freq,dates,upTo,g.goal_type);
+      html += `<div class="stand-goal-row">
+        <span style="font-size:16px">${g.emoji}</span>
+        <div style="flex:1">
+          <div style="font-family:sans-serif;font-size:12px;font-weight:600;color:#444;margin-bottom:4px">${g.goal_text}</div>
+          ${bar(sc2.pct,sc.p,5)}
+        </div>
+        <span style="font-family:sans-serif;font-size:12px;font-weight:700;color:${sc.p};width:34px;text-align:right">${sc2.pct}%</span>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div style="padding:14px 16px;font-family:sans-serif;font-size:13px;color:#bbb;background:#fff">Hasn't set goals yet</div>`;
+  }
+  return html + `</div>`;
+}
+
+function renderStandings() {
+  const t = today();
+  const shift = APP.shifts.find(s=>s.id===APP.viewShiftId) || currentShift();
+  if(!shift) { go("home"); return ""; }
+  const upTo = t < shift.end_date ? t : shift.end_date;
+  return `<div class="screen">
+    <div class="track-header grad-header">
+      <button class="back-btn" data-screen="menu">← Back</button>
+      <div class="track-name">${shift.name||"Sister Shift"}</div>
+      <div class="track-dates-line">Sister Standings · ${fmtSh(shift.start_date)} — ${fmtSh(shift.end_date)}</div>
+    </div>
+    <div style="padding:20px 16px 48px">
+      <button class="outline-btn" id="js-refresh" style="color:#1A7A6E;border-color:#1A7A6E;margin-bottom:16px">↻ Refresh</button>
+      ${SISTERS.map(s=>sisterCard(s,shift.id,upTo)).join("")}
+    </div></div>`;
+}
+
+function renderHistory() {
+  const shift = APP.shifts.find(s=>s.id===APP.viewShiftId);
+  if(!shift) { go("home"); return ""; }
+  return `<div class="screen">
+    <div class="track-header grad-header">
+      <button class="back-btn" data-screen="home">← Back</button>
+      <div class="badge" style="margin-top:4px">COMPLETED SHIFT</div>
+      <div class="track-name">${shift.name||"Sister Shift"}</div>
+      <div class="track-dates-line">${fmtYr(shift.start_date)} — ${fmtYr(shift.end_date)}</div>
+
+    </div>
+    <div style="padding:20px 16px 48px">
+      ${SISTERS.map(s=>sisterCard(s,shift.id,shift.end_date)).join("")}
+    </div></div>`;
+}
+
+
+// ── MANAGE SHIFT ──────────────────────────────────────────────────────────────
+function renderManageShift() {
+  const app = document.getElementById("app");
+  const s = APP.sister, c = COLORS[s];
+  const shift = APP.shifts.find(x=>x.id===APP.viewShiftId);
+  if(!shift) { go("menu"); return; }
+
+  app.innerHTML = `<div class="screen" style="background:${c.l}">
+    <div class="top-bar"><button type="button" class="back-btn-dark" id="ms-back">← Back</button></div>
+    <div class="setup-inner">
+      <div class="setup-title" style="color:${c.t}">Manage Shift</div>
+      <p class="setup-sub">Edit this shift's name and dates, or delete it entirely.</p>
+
+      <div class="date-section">
+        <div class="date-section-title">SHIFT NAME</div>
+        <input type="text" id="ms-name" class="date-input"
+          placeholder="e.g. Shift 11" maxlength="40"
+          value="${(shift.name||"").replace(/"/g,"&quot;")}"
+          style="border-color:${c.p};margin-bottom:14px"/>
+        <div class="date-section-title">SHIFT DATES</div>
+        <div class="date-row">
+          <div class="date-field">
+            <span class="date-label-txt">Start</span>
+            <input type="date" id="ms-start" class="date-input"
+              value="${shift.start_date}" style="border-color:${c.p}"/>
+          </div>
+          <div class="date-arrow">→</div>
+          <div class="date-field">
+            <span class="date-label-txt">End</span>
+            <input type="date" id="ms-end" class="date-input"
+              value="${shift.end_date}" style="border-color:${c.p}"/>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="save-btn" id="ms-save" style="background:${c.p}">
+        Save Changes ✦
+      </button>
+
+      <div style="margin-top:24px;padding:16px;background:#fff;border-radius:14px;border:1.5px solid #ffcccc;">
+        <div style="font-family:sans-serif;font-size:13px;font-weight:700;color:#cc3333;margin-bottom:6px">⚠️ Danger Zone</div>
+        <div style="font-family:sans-serif;font-size:12px;color:#888;margin-bottom:12px;line-height:1.5">
+          Deleting a shift permanently removes it along with all goals and check-ins for every sister. This cannot be undone.
+        </div>
+        <button type="button" id="ms-delete"
+          style="width:100%;padding:13px;border-radius:11px;border:1.5px solid #cc3333;
+          background:#fff;color:#cc3333;font-family:sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
+          🗑 Delete This Shift
+        </button>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById("ms-back").onclick = () => go("menu");
+
+  document.getElementById("ms-start").onchange = function(){
+    document.getElementById("ms-end").value = addDay(this.value, 13);
+  };
+
+  document.getElementById("ms-save").onclick = async function(){
+    const name  = document.getElementById("ms-name").value.trim() || "Sister Shift";
+    const start = document.getElementById("ms-start").value;
+    const end   = document.getElementById("ms-end").value;
+    if(!start || !end){ showToast("Please set both dates"); return; }
+    if(end < start){ showToast("End date must be after start"); return; }
+    this.textContent = "Saving…"; this.disabled = true;
+    try {
+      await dbPatch("shifts", {name, start_date:start, end_date:end}, `?id=eq.${shift.id}`);
+      await loadData();
+      showToast("Shift updated! ✨");
+      go("menu");
+    } catch(e) {
+      showToast("Save failed — please try again");
+      this.textContent = "Save Changes ✦"; this.disabled = false;
+    }
+  };
+
+  document.getElementById("ms-delete").onclick = async function(){
+    const confirmed = window.confirm(
+      `Delete "${shift.name||"this shift"}" (${shift.start_date} to ${shift.end_date})?\n\nThis will permanently remove all goals and check-ins for every sister. This cannot be undone.`
+    );
+    if(!confirmed) return;
+    this.textContent = "Deleting…"; this.disabled = true;
+    try {
+      // Delete checkins, goals, then the shift itself
+      await dbReq("checkins","DELETE",null,`?shift_id=eq.${shift.id}`);
+      await dbReq("sister_goals","DELETE",null,`?shift_id=eq.${shift.id}`);
+      await dbReq("shifts","DELETE",null,`?id=eq.${shift.id}`);
+      await loadData();
+      showToast("Shift deleted");
+      go("home");
+    } catch(e) {
+      showToast("Delete failed — please try again");
+      this.textContent = "🗑 Delete This Shift"; this.disabled = false;
+    }
+  };
+}
+
+// ── EVENT WIRING ──────────────────────────────────────────────────────────────
+function wire() {
+  try {
+  // Navigation buttons with data-screen
+  document.querySelectorAll("[data-screen]").forEach(el=>{
+    el.onclick = function(e){
+      e.preventDefault();
+      const screen   = this.dataset.screen;
+      const sister   = this.dataset.sister;
+      const shiftId  = this.dataset.shiftid;
+      const start    = this.dataset.start;
+      const end      = this.dataset.end;
+      if(sister)  APP.sister = sister;
+      if(shiftId) APP.viewShiftId = shiftId;
+      if(screen === "setup") {
+        APP._setupStart = start || today();
+        APP._setupEnd   = end   || addDay(today(),13);
+        APP._editMode   = false;
+        APP._joinMode   = false;
+      }
+      if(screen === "editgoals") {
+        const cur2 = currentShift();
+        if(cur2) {
+          APP._setupStart = cur2.start_date;
+          APP._setupEnd   = cur2.end_date;
+          APP._editMode   = true;
+          APP._joinMode   = false;
+          go("setup");
+          return;
+        }
+      }
+      if(screen === "joinshift") {
+        // Join an existing shift - use its dates, no name/date editing
+        APP._setupStart = start || today();
+        APP._setupEnd   = end   || addDay(today(), 13);
+        APP._editMode   = false;
+        APP._joinMode   = true;
+        go("setup");
+        return;
+      }
+      if(screen === "manageshift") {
+        if(shiftId) APP.viewShiftId = shiftId;
+        renderManageShift();
+        return;
+      }
+      go(screen);
+    };
+  });
+
+  // Check-in buttons
+  document.querySelectorAll("[data-ci]").forEach(btn=>{
+    btn.onclick = async function(){
+      const [shiftId,sister,goalIdx,date] = this.dataset.ci.split("|");
+      const gi = parseInt(goalIdx);
+      const id = `${shiftId}-${sister}-${gi}-${date}`;
+      const ex = APP.checkins.find(c=>c.id===id);
+      // Optimistic toggle
+      if(ex) {
+        ex.checked = !ex.checked;
+      } else {
+        APP.checkins.push({id,shift_id:shiftId,sister_name:sister,goal_index:gi,date,checked:true});
+      }
+      render(); // re-render track screen with new state
+      // Sync to DB
+      try {
+        if(ex) await dbPatch("checkins",{checked:ex.checked},`?id=eq.${id}`);
+        else   await dbUpsert("checkins",{id,shift_id:shiftId,sister_name:sister,goal_index:gi,date,checked:true});
+      } catch(e) {
+        // Revert
+        if(ex) ex.checked = !ex.checked;
+        else APP.checkins = APP.checkins.filter(c=>c.id!==id);
+        render();
+        showToast("Couldn't save check-in — retry");
+      }
+    };
+  });
+
+  // Refresh
+  const rb = document.getElementById("js-refresh");
+  if(rb) rb.onclick = () => { showToast("Refreshing…"); loadData(); };
+  } catch(e) { console.error("Wire error:", e); }
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+render();      // show UI immediately (empty state)
+loadData();    // fetch from Supabase in background
+</script>
+</body>
+</html>
