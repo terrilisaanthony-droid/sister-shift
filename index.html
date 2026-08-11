@@ -128,11 +128,22 @@ input{font-family:sans-serif;color:#333;}
   color:#fff;padding:14px 18px;border-radius:16px;font-size:13px;font-weight:600;
   font-family:sans-serif;z-index:8000;white-space:normal;word-break:break-word;
   box-shadow:0 4px 20px rgba(0,0,0,0.3);display:none;pointer-events:none;line-height:1.5;}
+.celebration{position:fixed;top:0;left:0;right:0;z-index:9000;pointer-events:none;}
+.cel-banner{margin:10px 14px 0;background:linear-gradient(135deg,#0D3B4F 0%,#1A7A6E 100%);
+  color:#fff;border-radius:16px;padding:14px 18px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.3);font-family:sans-serif;
+  display:flex;align-items:center;gap:12px;border:1.5px solid rgba(194,168,120,0.4);
+  animation:celDown .4s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes celDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+.cel-icon{font-size:26px;flex-shrink:0;}
+.cel-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.cel-sub{font-size:12px;opacity:.75;}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div class="toast" id="toast"></div>
+<div class="celebration" id="celebration"></div>
 
 <script>
 const SUPA_URL = "https://ecishaultjdxzivhdgme.supabase.co";
@@ -202,7 +213,10 @@ let APP = {
   shifts: [],
   goals: [],
   checkins: [],
-  _goalCount: 5, // starts at 5, can be expanded
+  _goalCount: 5,
+  _lastCheckinCount: 0,      // track how many checkins we've seen
+  _lastPollTime: null,       // when we last polled
+  _seenCheckins: new Set(),  // checkin IDs we've already celebrated
 };
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -1121,12 +1135,28 @@ function wire() {
       const id = `${shiftId}-${sister}-${gi}-${date}`;
       const ex = APP.checkins.find(c=>c.id===id);
       // Optimistic toggle
+      const wasChecked = ex ? ex.checked : false;
       if(ex) {
         ex.checked = !ex.checked;
       } else {
         APP.checkins.push({id,shift_id:shiftId,sister_name:sister,goal_index:gi,date,checked:true});
       }
       render(); // re-render track screen with new state
+
+      // 🎉 Celebrate when checking IN (not unchecking)
+      const nowChecked = ex ? !wasChecked : true;
+      if(nowChecked) {
+        const goal = APP.goals.find(g =>
+          g.shift_id === shiftId &&
+          g.sister_name === sister &&
+          g.goal_index === gi
+        );
+        if(goal && goal.goal_text) {
+          // Mark as seen so polling doesn't double-celebrate
+          APP._seenCheckins.add(id);
+          showCelebration(sister, goal.goal_text);
+        }
+      }
       // Sync to DB
       try {
         if(ex) await dbPatch("checkins",{checked:ex.checked},`?id=eq.${id}`);
@@ -1147,9 +1177,137 @@ function wire() {
   } catch(e) { console.error("Wire error:", e); }
 }
 
+// ── CELEBRATION NOTIFICATIONS ────────────────────────────────────────────────
+
+const CELEBRATION_MESSAGES = [
+  (name, goal) => `${name} just crushed "${goal}"! 💪`,
+  (name, goal) => `${name} is ON IT — "${goal}" done! 🔥`,
+  (name, goal) => `${name} checked off "${goal}" — get off your ass! 😄`,
+  (name, goal) => `${name} said no excuses — "${goal}" complete! ⭐`,
+  (name, goal) => `"${goal}" — handled. ${name} is putting in work! 💥`,
+  (name, goal) => `${name} showed UP for "${goal}"! Are you next? 👀`,
+  (name, goal) => `${name} didn't play around — "${goal}" done! 🎯`,
+];
+
+function getCelebrationMsg(sisterName, goalText) {
+  const firstName = sisterName.split("-")[0];
+  const fn = CELEBRATION_MESSAGES[Math.floor(Math.random() * CELEBRATION_MESSAGES.length)];
+  return fn(firstName, goalText);
+}
+
+function getSisterColor(sisterName) {
+  return (COLORS[sisterName] || COLORS["Terri-Lisa"]).p;
+}
+
+let _celQueue = [];
+let _celShowing = false;
+let _celTimer = null;
+
+function showCelebration(sisterName, goalText) {
+  _celQueue.push({sisterName, goalText});
+  if(!_celShowing) processNextCelebration();
+}
+
+function processNextCelebration() {
+  if(!_celQueue.length) { _celShowing = false; return; }
+  _celShowing = true;
+  const {sisterName, goalText} = _celQueue.shift();
+  const msg = getCelebrationMsg(sisterName, goalText);
+  const color = getSisterColor(sisterName);
+  const initial = sisterName[0];
+
+  const cel = document.getElementById("celebration");
+  cel.innerHTML = `<div class="cel-banner">
+    <div class="cel-icon" style="width:42px;height:42px;border-radius:50%;
+      background:${color};display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:18px;font-weight:700;font-family:sans-serif;flex-shrink:0;">
+      ${initial}
+    </div>
+    <div style="flex:1">
+      <div class="cel-title">${msg}</div>
+      <div class="cel-sub">Sister Shift · keeping each other accountable 🌟</div>
+    </div>
+  </div>`;
+
+  // Auto-dismiss after 4 seconds, then show next in queue
+  if(_celTimer) clearTimeout(_celTimer);
+  _celTimer = setTimeout(() => {
+    cel.innerHTML = "";
+    setTimeout(() => processNextCelebration(), 400);
+  }, 4500);
+}
+
+// ── POLLING FOR OTHER SISTERS' CHECK-INS ─────────────────────────────────────
+let _pollInterval = null;
+
+async function pollForCelebrations() {
+  try {
+    const cur = currentShift();
+    if(!cur) return;
+
+    // Fetch recent checkins (last 24 hours, checked = true only)
+    const since = new Date(Date.now() - 24*60*60*1000).toISOString().split("T")[0];
+    const fresh = await dbGet("checkins",
+      `?shift_id=eq.${cur.id}&checked=eq.true&date=gte.${since}&order=id.desc&limit=50`);
+
+    fresh.forEach(c => {
+      // Skip our own check-ins and ones we've already seen
+      if(c.sister_name === APP.sister) return;
+      if(APP._seenCheckins.has(c.id)) return;
+
+      // Mark as seen
+      APP._seenCheckins.add(c.id);
+
+      // Find the goal text
+      const goal = APP.goals.find(g =>
+        g.shift_id === cur.id &&
+        g.sister_name === c.sister_name &&
+        g.goal_index === c.goal_index
+      );
+      if(goal && goal.goal_text) {
+        showCelebration(c.sister_name, goal.goal_text);
+      }
+    });
+
+    // Also update local checkins so UI stays fresh
+    APP.checkins = await dbGet("checkins", "");
+    render();
+
+  } catch(e) {
+    // Silent fail — polling errors shouldn't interrupt the user
+  }
+}
+
+function startPolling() {
+  if(_pollInterval) clearInterval(_pollInterval);
+  // Poll every 30 seconds
+  _pollInterval = setInterval(pollForCelebrations, 30000);
+  // Also run once immediately on start (catch-up for reopening)
+  setTimeout(pollForCelebrations, 1500);
+}
+
+function stopPolling() {
+  if(_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; }
+}
+
+// ── Also fire celebration for YOUR OWN check-in (self-motivation!) ───────────
+const _origToggleCheckin = toggleCheckin;
+// We'll hook into toggleCheckin after definition below
+
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 render();      // show UI immediately (empty state)
-loadData();    // fetch from Supabase in background
+loadData().then(() => {
+  // After initial load, mark all existing checkins as "seen" so we only
+  // celebrate NEW ones going forward (don't spam on app open)
+  const cur = currentShift();
+  if(cur) {
+    const today_str = today();
+    APP.checkins
+      .filter(c => c.date < today_str) // only mark PAST days as seen
+      .forEach(c => APP._seenCheckins.add(c.id));
+  }
+  startPolling();
+});
 </script>
 </body>
 </html>
