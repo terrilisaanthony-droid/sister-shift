@@ -216,7 +216,7 @@ let APP = {
   _goalCount: 5,
   _lastCheckinCount: 0,      // track how many checkins we've seen
   _lastPollTime: null,       // when we last polled
-  _seenCheckins: new Set(),  // checkin IDs we've already celebrated
+  _seenCheckins: new Set(JSON.parse(localStorage.getItem('ss_seen')||'[]')), // persists across refreshes
 };
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -1154,6 +1154,7 @@ function wire() {
         if(goal && goal.goal_text) {
           // Mark as seen so polling doesn't double-celebrate
           APP._seenCheckins.add(id);
+          localStorage.setItem('ss_seen', JSON.stringify([...APP._seenCheckins].slice(-500)));
           showCelebration(sister, goal.goal_text);
         }
       }
@@ -1257,6 +1258,7 @@ async function pollForCelebrations() {
 
       // Mark as seen
       APP._seenCheckins.add(c.id);
+      localStorage.setItem('ss_seen', JSON.stringify([...APP._seenCheckins].slice(-500)));
 
       // Find the goal text
       const goal = APP.goals.find(g =>
@@ -1301,6 +1303,8 @@ loadData().then(() => {
     APP.checkins
       .filter(c => c.date < today_str) // only mark PAST days as seen
       .forEach(c => APP._seenCheckins.add(c.id));
+    // Persist so refreshes don't replay old notifications
+    localStorage.setItem('ss_seen', JSON.stringify([...APP._seenCheckins].slice(-500)));
   }
   startPolling();
 });
