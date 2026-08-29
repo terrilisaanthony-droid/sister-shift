@@ -933,7 +933,8 @@ function sisterCard(sister, shiftId, upTo) {
       html += `<div class="stand-goal-row">
         <span style="font-size:16px">${g.emoji}</span>
         <div style="flex:1">
-          <div style="font-family:sans-serif;font-size:12px;font-weight:600;color:#444;margin-bottom:4px">${g.goal_text}</div>
+          <div style="font-family:sans-serif;font-size:12px;font-weight:600;color:#444;margin-bottom:1px">${g.goal_text}</div>
+          <div style="font-family:sans-serif;font-size:10px;color:#aaa;margin-bottom:3px">${FREQ_L[g.freq]||g.freq}</div>
           ${bar(sc2.pct,sc.p,5)}
         </div>
         <span style="font-family:sans-serif;font-size:12px;font-weight:700;color:${sc.p};width:34px;text-align:right">${sc2.pct}%</span>
