@@ -390,9 +390,11 @@ function renderHome() {
       <div class="sister-initial" style="background:${c.p}">${s[0]}</div>
       <div class="sister-name" style="color:${c.t}">${s.split("-")[0]}</div>
       ${prog
-        ? `<div class="mini-prog">
-             <div class="mini-prog-fill" style="width:${Math.min(prog.pct,100)}%;background:${c.p}"></div>
-             <span class="mini-prog-label" style="color:${c.p}">${prog.pct}%</span>
+        ? `<div style="width:100%;display:flex;align-items:center;gap:4px;margin-top:2px;">
+             <div class="mini-prog" style="flex:1">
+               <div class="mini-prog-fill" style="width:${Math.min(prog.pct,100)}%;background:${c.p}"></div>
+             </div>
+             <span style="font-size:10px;font-weight:700;color:${c.p};flex-shrink:0;">${prog.pct}%</span>
            </div>`
         : `<div style="color:${c.p};font-size:11px;margin-top:4px;font-family:sans-serif">Tap to start</div>`}
     </button>`;
