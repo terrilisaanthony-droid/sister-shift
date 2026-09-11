@@ -612,6 +612,7 @@ function renderSetup() {
   document.getElementById("setup-back").onclick = () => {
     APP._savedGoals = null;
     APP._goalCount  = 5;
+    startPolling(); // resume polling when leaving setup
     go("menu");
   };
 
@@ -763,6 +764,9 @@ async function saveShift() {
     document.body.removeChild(overlay);
     showToast(APP._editMode ? "Goals updated! ✨" : "Goals saved! Let\'s go 💪");
     APP._editMode = false;
+    APP._savedGoals = null;
+    APP._goalCount  = 5;
+    startPolling(); // resume polling after save
     // Go to menu so sister can tap Track Today
     go("menu");
 
@@ -1100,6 +1104,7 @@ function wire() {
         APP._setupEnd   = end   || addDay(today(),13);
         APP._editMode   = false;
         APP._joinMode   = false;
+        stopPolling(); // pause polling while on setup screen
       }
       if(screen === "editgoals") {
         const cur2 = currentShift();
@@ -1108,6 +1113,7 @@ function wire() {
           APP._setupEnd   = cur2.end_date;
           APP._editMode   = true;
           APP._joinMode   = false;
+          stopPolling(); // pause polling while editing goals
           go("setup");
           return;
         }
@@ -1118,6 +1124,7 @@ function wire() {
         APP._setupEnd   = end   || addDay(today(), 13);
         APP._editMode   = false;
         APP._joinMode   = true;
+        stopPolling(); // pause polling while filling in goals
         go("setup");
         return;
       }
@@ -1246,6 +1253,8 @@ let _pollInterval = null;
 
 async function pollForCelebrations() {
   try {
+    // Never poll while user is filling in the setup form
+    if(APP.screen === "setup") return;
     const cur = currentShift();
     if(!cur) return;
 
